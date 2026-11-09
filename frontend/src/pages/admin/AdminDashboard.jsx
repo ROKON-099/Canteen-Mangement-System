@@ -1,337 +1,152 @@
+import { ShoppingBag, Users, Wallet, TrendingUp, ArrowUpRight } from "lucide-react";
+import { readStorage } from "../../utils/storage";
+import formatCurrency from "../../utils/formatCurrency";
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import {
-  ShoppingBag,
-  Clock,
-  CheckCircle,
-  Utensils,
-  Plus,
-  ClipboardList,
-  TrendingUp,
-  ArrowUpRight,
-  MoreHorizontal,
-  CalendarDays,
-} from "lucide-react";
+export default function AdminDashboard() {
+  const orders = readStorage("canteen_orders", []);
+  const users = readStorage("canteen_users", []);
 
-const AdminDashboard = () => {
-  const [orders] = useState([
-    {
-      id: "#ORD-1001",
-      customer: "Rahim Ahmed",
-      food: "Chicken Burger",
-      amount: 250,
-      date: "Nov 05, 2026",
-      status: "Pending",
-    },
-    {
-      id: "#ORD-1002",
-      customer: "Karim Hasan",
-      food: "Pizza",
-      amount: 350,
-      date: "Nov 05, 2026",
-      status: "Completed",
-    },
-    {
-      id: "#ORD-1003",
-      customer: "Sakib Hossain",
-      food: "Fried Rice",
-      amount: 180,
-      date: "Nov 05, 2026",
-      status: "Preparing",
-    },
-    {
-      id: "#ORD-1004",
-      customer: "Nusrat Jahan",
-      food: "Sandwich",
-      amount: 120,
-      date: "Nov 04, 2026",
-      status: "Completed",
-    },
-    {
-      id: "#ORD-1005",
-      customer: "Tanvir Islam",
-      food: "Chicken Pasta",
-      amount: 220,
-      date: "Nov 04, 2026",
-      status: "Pending",
-    },
-  ]);
+  const revenue = orders
+    .filter((o) => o.status !== "Cancelled")
+    .reduce((sum, o) => sum + o.total, 0);
 
   const stats = [
     {
-      title: "Total Orders",
-      value: "248",
-      change: "+12.5%",
+      label: "Total Orders",
+      value: orders.length,
       icon: ShoppingBag,
       color: "bg-blue-50 text-blue-600",
     },
     {
-      title: "Pending Orders",
-      value: "18",
-      change: "Needs attention",
-      icon: Clock,
-      color: "bg-orange-50 text-orange-600",
-    },
-    {
-      title: "Completed Orders",
-      value: "210",
-      change: "+8.2%",
-      icon: CheckCircle,
-      color: "bg-green-50 text-green-600",
-    },
-    {
-      title: "Total Food Items",
-      value: "36",
-      change: "Available menu",
-      icon: Utensils,
+      label: "Registered Users",
+      value: users.filter((u) => u.role !== "admin").length,
+      icon: Users,
       color: "bg-purple-50 text-purple-600",
+    },
+    {
+      label: "Total Revenue",
+      value: formatCurrency(revenue),
+      icon: Wallet,
+      color: "bg-emerald-50 text-emerald-600",
     },
   ];
 
-  const getStatusStyle = (status) => {
-    switch (status) {
-      case "Completed":
-        return "bg-green-50 text-green-700";
-      case "Pending":
-        return "bg-orange-50 text-orange-700";
-      case "Preparing":
-        return "bg-blue-50 text-blue-700";
-      default:
-        return "bg-gray-100 text-gray-600";
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50">
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 mb-8">
-
-          <div>
-            <p className="text-sm font-medium text-green-600 mb-2">
-              CANTEENPRO / ADMIN
-            </p>
-
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
-              Dashboard Overview
-            </h1>
-
-            <p className="text-gray-500 text-sm mt-2">
-              Welcome back! Here's what's happening in your canteen.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-
-            <Link
-              to="/admin/orders"
-              className="flex items-center gap-2 px-5 py-3 rounded-xl border border-gray-200 bg-white text-gray-700 font-semibold text-sm hover:border-green-300 hover:text-green-600 transition"
-            >
-              <ClipboardList size={18} />
-              View Orders
-            </Link>
-
-            <Link
-              to="/admin/add-food"
-              className="flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-green-600 to-emerald-500 text-white font-semibold text-sm shadow-lg shadow-green-200/60 hover:-translate-y-0.5 transition"
-            >
-              <Plus size={19} />
-              Add Food
-            </Link>
-
-          </div>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-widest text-emerald-600">
+            Overview
+          </p>
+          <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-900">
+            Dashboard
+          </h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Welcome back! Here's what's happening with your canteen.
+          </p>
         </div>
 
-        {/* Date Section */}
-        <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-          <CalendarDays size={17} className="text-green-600" />
-          <span>Thursday, November 5, 2026</span>
+        <div className="flex items-center gap-2 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-700">
+          <TrendingUp size={17} />
+          Management Overview
         </div>
-
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-9">
-
-          {stats.map((stat, index) => {
-            const Icon = stat.icon;
-
-            return (
-              <div
-                key={index}
-                className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300"
-              >
-
-                <div className="flex items-center justify-between mb-5">
-
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.color}`}>
-                    <Icon size={23} />
-                  </div>
-
-                  <button className="text-gray-400 hover:text-gray-700">
-                    <MoreHorizontal size={22} />
-                  </button>
-
-                </div>
-
-                <p className="text-sm text-gray-500 font-medium">
-                  {stat.title}
-                </p>
-
-                <div className="flex items-end justify-between mt-2">
-
-                  <h2 className="text-3xl font-extrabold text-gray-900">
-                    {stat.value}
-                  </h2>
-
-                  <span className="text-xs font-semibold text-green-600 flex items-center gap-1">
-                    {index === 0 || index === 2 ? (
-                      <TrendingUp size={14} />
-                    ) : null}
-                    {stat.change}
-                  </span>
-
-                </div>
-
-              </div>
-            );
-          })}
-
-        </div>
-
-        {/* Recent Orders */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 border-b border-gray-100">
-
-            <div>
-              <h2 className="text-lg font-bold text-gray-900">
-                Recent Orders
-              </h2>
-
-              <p className="text-sm text-gray-500 mt-1">
-                Monitor your latest customer orders.
-              </p>
-            </div>
-
-            <Link
-              to="/admin/orders"
-              className="flex items-center gap-1 text-sm font-bold text-green-600 hover:text-green-700 transition"
-            >
-              View All Orders
-              <ArrowUpRight size={17} />
-            </Link>
-
-          </div>
-
-          {/* Table */}
-          <div className="overflow-x-auto">
-
-            <table className="w-full text-left whitespace-nowrap">
-
-              <thead className="bg-gray-50/80">
-
-                <tr className="text-xs uppercase tracking-wider text-gray-500">
-                  <th className="px-6 py-4 font-semibold">Order ID</th>
-                  <th className="px-6 py-4 font-semibold">Customer</th>
-                  <th className="px-6 py-4 font-semibold">Food Item</th>
-                  <th className="px-6 py-4 font-semibold">Amount</th>
-                  <th className="px-6 py-4 font-semibold">Date</th>
-                  <th className="px-6 py-4 font-semibold">Status</th>
-                </tr>
-
-              </thead>
-
-              <tbody className="divide-y divide-gray-100">
-
-                {orders.map((order) => (
-
-                  <tr
-                    key={order.id}
-                    className="hover:bg-green-50/30 transition"
-                  >
-
-                    <td className="px-6 py-5 text-sm font-bold text-gray-800">
-                      {order.id}
-                    </td>
-
-                    <td className="px-6 py-5 text-sm font-semibold text-gray-700">
-                      {order.customer}
-                    </td>
-
-                    <td className="px-6 py-5 text-sm text-gray-600">
-                      {order.food}
-                    </td>
-
-                    <td className="px-6 py-5 text-sm font-bold text-gray-800">
-                      ৳{order.amount}
-                    </td>
-
-                    <td className="px-6 py-5 text-sm text-gray-500">
-                      {order.date}
-                    </td>
-
-                    <td className="px-6 py-5">
-                      <span className={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-bold ${getStatusStyle(order.status)}`}>
-                        {order.status}
-                      </span>
-                    </td>
-
-                  </tr>
-
-                ))}
-
-              </tbody>
-
-            </table>
-
-          </div>
-
-          {/* Table Footer */}
-          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
-
-            <p className="text-xs sm:text-sm text-gray-500">
-              Showing 5 recent orders
-            </p>
-
-            <Link
-              to="/admin/orders"
-              className="text-sm font-semibold text-green-600 hover:text-green-700"
-            >
-              See All →
-            </Link>
-
-          </div>
-
-        </div>
-
-        {/* Bottom Info */}
-        <div className="mt-7 bg-gradient-to-r from-green-600 to-emerald-500 rounded-2xl p-6 sm:p-8 text-white flex flex-col sm:flex-row items-center justify-between gap-5">
-
-          <div>
-            <h3 className="text-xl font-bold mb-2">
-              Manage Your Canteen Efficiently
-            </h3>
-
-            <p className="text-sm text-green-50">
-              Keep your food menu updated and manage customer orders easily.
-            </p>
-          </div>
-
-          <Link
-            to="/admin/orders"
-            className="shrink-0 bg-white text-green-700 px-6 py-3 rounded-xl font-bold text-sm hover:bg-green-50 transition"
-          >
-            Manage Orders
-          </Link>
-
-        </div>
-
       </div>
 
+      {/* Statistics */}
+      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        {stats.map(({ label, value, icon: Icon, color }) => (
+          <div
+            key={label}
+            className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+          >
+            <div className="flex items-center justify-between">
+              <div className={`grid h-12 w-12 place-items-center rounded-xl ${color}`}>
+                <Icon size={23} />
+              </div>
+              <ArrowUpRight size={19} className="text-slate-300" />
+            </div>
+
+            <p className="mt-5 text-sm font-medium text-slate-500">
+              {label}
+            </p>
+
+            <h2 className="mt-1 text-3xl font-black tracking-tight text-slate-900">
+              {value}
+            </h2>
+          </div>
+        ))}
+      </div>
+
+      {/* Recent Orders */}
+      <section className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
+          <div>
+            <h2 className="text-lg font-bold text-slate-900">
+              Recent Orders
+            </h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Latest customer orders and their details.
+            </p>
+          </div>
+
+          <span className="rounded-lg bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700">
+            {orders.length} Orders
+          </span>
+        </div>
+
+        {orders.length > 0 ? (
+          <div className="divide-y divide-slate-100">
+            {orders.slice(0, 5).map((order) => (
+              <div
+                key={order.id}
+                className="flex flex-wrap items-center justify-between gap-4 px-6 py-4 transition hover:bg-slate-50"
+              >
+                <div className="min-w-0">
+                  <p className="truncate font-bold text-slate-800">
+                    {order.customerName}
+                  </p>
+                  <p className="mt-1 text-xs text-slate-400">
+                    {order.id} · {new Date(order.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-bold ${
+                      order.status === "Completed"
+                        ? "bg-emerald-50 text-emerald-700"
+                        : order.status === "Cancelled"
+                        ? "bg-red-50 text-red-600"
+                        : order.status === "Ready"
+                        ? "bg-blue-50 text-blue-600"
+                        : "bg-amber-50 text-amber-700"
+                    }`}
+                  >
+                    {order.status}
+                  </span>
+
+                  <p className="min-w-20 text-right font-bold text-slate-900">
+                    {formatCurrency(order.total)}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="px-6 py-16 text-center">
+            <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-slate-50 text-slate-400">
+              <ShoppingBag size={26} />
+            </div>
+            <h3 className="mt-4 font-bold text-slate-800">
+              No orders yet
+            </h3>
+            <p className="mt-1 text-sm text-slate-500">
+              New customer orders will appear here.
+            </p>
+          </div>
+        )}
+      </section>
     </div>
   );
-};
-
-export default AdminDashboard;
+}
